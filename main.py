@@ -1,0 +1,1 @@
+print("TinyGPT project initialized!")
