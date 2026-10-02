@@ -1,0 +1,124 @@
+# Implementation Plan: Enhancing TinyGPT Intelligence & Out-of-Context Handling
+
+## 1. Problem Diagnosis: Why the Bot Struggles Currently
+
+During live testing with inputs like:
+- Short keywords: `gpa for admission` (instead of full sentence *"what is the minimum gpa for admission?"*)
+- Typo/mixed queries: `clar ine?d freshman housing?admission?`
+- Out-of-context / system commands: `clear ur data`, `who is the president?`, `write a poem`
+
+The model produced concatenated fragments or hallucinated transitions (e.g. *"to accept my admission offer? need to campus walking tours..."*).
+
+### Root Causes
+1. **Pure Autoregressive Memorization**: At ~808K parameters, the model is trained purely to predict the next word following an exact `<BOS> <USER> ... <ASSISTANT>` syntax. When given an incomplete phrase or out-of-domain prompt, the conditioning logits scatter, producing unpredictable outputs.
+2. **Absence of Intent Classification & Out-of-Domain (OOD) Detection**: The bot currently treats every string as an in-domain admissions question. It has no mechanism to determine: *"Do I actually know the answer to this?"*
+3. **Zero Semantic Grounding / Retrieval**: The model has to do both **semantic parsing** (understanding intent) and **knowledge retrieval** simultaneously in its small weights. If the phrasing diverges from the training distribution, generation derails.
+
+---
+
+## 2. Proposed Architecture: The Hybrid Intelligent Assistant
+
+To make the bot truly "smart" without losing its lightweight CPU efficiency, we transition from a **fragile single-model generative bot** to a **Robust Hybrid Intelligent Architecture**:
+
+```mermaid
+flowchart TD
+    UserInput([User Query in CLI]) --> Preprocessor[Text Normalizer & Spell/Typo Handling]
+    Preprocessor --> IntentClassifier{Intent & OOD Classifier}
+
+    %% Intent routing
+    IntentClassifier -->|1. Casual Banter / Greeting| ChitChat[Chit-Chat Handler: Polite greetings & persona]
+    IntentClassifier -->|2. Out-of-Scope Query| FallbackEngine[Intelligent Fallback & Graceful Referral]
+    IntentClassifier -->|3. Ambiguous / Partial Query| Clarifier[Smart Disambiguation & Suggested Prompts]
+    IntentClassifier -->|4. Admissions In-Domain Query| SemanticRetriever[Semantic Matcher / Dense BM25 Retriever]
+
+    %% Admissions pipeline
+    SemanticRetriever --> ConfidenceCheck{Match Confidence Score}
+    ConfidenceCheck -->|Low Confidence < 0.45| Clarifier
+    ConfidenceCheck -->|High Confidence >= 0.45| ContextBuilder[Assemble Grounded Prompt + KB Context]
+    ContextBuilder --> NeuralLM[TinyGPT Neural Generator with Constrained Decoding]
+    NeuralLM --> OutputPostProcess[Response Sanitizer & Post-Processor]
+
+    %% Final outputs
+    ChitChat --> FinalResponse([Final Output to User])
+    FallbackEngine --> FinalResponse
+    Clarifier --> FinalResponse
+    OutputPostProcess --> FinalResponse
+```
+
+---
+
+## 3. Core Enhancements Breakdown
+
+### Component 1: Out-of-Domain (OOD) & Intent Classifier
+- **Mechanism**: Fast lightweight TF-IDF / Cosine similarity classifier or logistic regression classifier with zero latency (<2ms).
+- **Classifications**:
+  1. `IN_DOMAIN_ADMISSION`: Relevant to college admissions (deadlines, tuition, requirements, etc.).
+  2. `GREETING_OR_CHITCHAT`: Greetings, thanks, goodbyes (*"hello"*, *"who are you"*, *"thank you"*).
+  3. `OUT_OF_SCOPE`: Queries about politics, coding, sports, weather, or system commands (*"clear ur data"*, *"what is python"*).
+  4. `VAGUE_AMBIGUOUS`: Single words or broken phrases (*"gpa"*, *"deadline"*, *"deposit"*).
+
+### Component 2: Smart Disambiguation & Clarification Engine
+- Instead of outputting broken text when a user types shorthand (e.g. `gpa for admission`), the bot identifies the candidate topics and either:
+  - Expands the query to the canonical prompt: `what is the minimum gpa for admission?`, OR
+  - Prompts the user: *"Are you asking about: (1) Minimum High School GPA requirements, or (2) Transfer GPA requirements?"*
+
+### Component 3: Retrieval-Augmented Grounding (Tiny RAG)
+- Even large LLMs (ChatGPT, Claude) use RAG to prevent hallucination.
+- Store the knowledge base as vector embeddings / BM25 chunks.
+- When a question arrives, retrieve the exact verified knowledge chunk (e.g., `Tuition: $18,500 in-state, $32,000 out-of-state`).
+- Feed both the question and the retrieved factual context into TinyGPT to formulate the answer, guaranteeing 100% factual accuracy on unseen or differently phrased queries.
+
+### Component 4: Out-of-Context Graceful Fallback
+- When an out-of-scope question is detected (e.g., *"clear ur data"*, *"who won the match?"*):
+  - **Bot Response**:
+    > *"I am specialized exclusively in University Admissions. I cannot assist with general topics or system commands, but I can help you with application deadlines, tuition & financial aid, GPA requirements, and campus life. Feel free to ask an admissions question or type `faq`!"*
+
+### Component 5: Robust Preprocessing & Fuzzy Matching
+- Handle typos and abbreviations (e.g., `reqs` $\rightarrow$ `requirements`, `tuition fee` $\rightarrow$ `tuition`).
+- Levenshtein / fuzzy keyword matcher that maps malformed inputs (`waht is tuition`) to proper domain tokens.
+
+---
+
+## 4. Phased Implementation Roadmap
+
+### Phase 1: Semantic Intent & Out-of-Scope (OOD) Gate
+- Implement `src/intent_router.py`:
+  - Builds TF-IDF centroid vectors for:
+    - 7 Admission domains
+    - Chit-chat / Greetings domain
+    - Common Out-of-Domain categories
+  - Computes cosine similarity confidence score.
+  - Returns intent type + confidence score.
+
+### Phase 2: Query Normalizer & Disambiguator
+- Implement `src/query_normalizer.py`:
+  - Expands common shorthand (e.g., `gpa` $\rightarrow$ `what is the gpa requirement?`, `housing?` $\rightarrow$ `is housing guaranteed?`).
+  - Cleans punctuations and handles malformed queries.
+
+### Phase 3: Intelligent Fallback & Persona Handlers
+- Implement graceful handlers for:
+  - Unrecognized / out-of-scope questions.
+  - Chit-chat / conversational pleasantries.
+  - Low-confidence queries with actionable follow-up buttons/suggestions.
+
+### Phase 4: Integration into `admissions_chat.py`
+- Wire the intent router and disambiguator directly into the chat loop.
+- Keep the `debug` command to allow inspecting both intent scores, retrieval confidence, and neural attention.
+
+### Phase 5: Verification & Benchmark Update
+- Add 15 new benchmark tests in `evaluate_admissions.py`:
+  - 5 shorthand / messy queries (e.g., `gpa for admission`, `tuition in state`).
+  - 5 out-of-scope queries (e.g., `clear ur data`, `how to bake a cake`).
+  - 5 conversational chitchat queries (e.g., `who made you`, `good morning`).
+
+---
+
+## 5. Technical Comparison: Before vs. After
+
+| Capability | Current Bot | Upgraded Smart Bot |
+| :--- | :--- | :--- |
+| **Full standard queries** | Works well (100% on benchmark) | Works well |
+| **Shorthand queries (`gpa for admission`)** | Fails / outputs fragmented text | Normalized & accurately answered |
+| **Out-of-context (`clear ur data`)** | Hallucinates random admissions words | Detects OOD; politely redirects to admissions scope |
+| **Greetings / Chit-chat** | Inconsistent generation | Natural persona-aligned replies |
+| **Ambiguous inputs** | Runs into repetitive loops | Suggests clarifying choices or FAQ topics |
