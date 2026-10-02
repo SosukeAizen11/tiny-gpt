@@ -21,13 +21,16 @@
 ## 🏗️ Training Pipeline
 
 ```mermaid
-flowchart LR
-    A["Admissions Corpus\ndata/admissions_data.txt\n180+ Q&A pairs"] --> B["Domain Tokenizer\nCurrency · GPA · Emails · Phones"]
-    B --> C["LanguageModelDataset\nContext Window: 128 tokens"]
-    C --> D["PyTorch DataLoader\nBatch Size: 16"]
-    D --> E["TinyGPT Model\n4 Layers · 128 Dim · 4 Heads · 512 FFN"]
-    E --> F["AdamW + Cosine LR\nLoss Target < 0.15"]
-    F --> G["Checkpoint\ntinygpt_admissions.pt"]
+flowchart TD
+    A["📄 Admissions Corpus\ndata/admissions_data.txt\n180+ Q&A pairs"]
+    B["🔤 Domain Tokenizer\nCurrency · GPA · Emails · Phones"]
+    C["📦 LanguageModelDataset\nContext Window: 128 tokens"]
+    D["🔄 PyTorch DataLoader\nBatch Size: 16 · Shuffle: True"]
+    E["🧠 TinyGPT Model\n4 Layers · 128 Dim · 4 Heads · 512 FFN"]
+    F["⚙️ AdamW + Cosine LR Scheduler\nTarget Loss < 0.15"]
+    G["💾 Saved Checkpoint\ncheckpoints/tinygpt_admissions.pt"]
+
+    A --> B --> C --> D --> E --> F --> G
 ```
 
 ---
