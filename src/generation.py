@@ -6,10 +6,11 @@ def generate_text(
     model,
     tokenizer,
     prompt,
-    max_new_tokens=30,
-    context_length=64,
-    temperature=0.8,
-    top_k=5
+    max_new_tokens=60,
+    context_length=128,
+    temperature=0.3,
+    top_k=5,
+    repetition_penalty=1.1
 ):
     model.eval()
 
@@ -33,6 +34,8 @@ def generate_text(
         formatted_prompt
     )
 
+    prompt_length = len(generated_ids)
+
     for _ in range(max_new_tokens):
 
         context_ids = generated_ids[
@@ -47,12 +50,21 @@ def generate_text(
         with torch.no_grad():
             logits, _ = model(input_tensor)
 
-        next_token_logits = logits[-1]
+        next_token_logits = logits[-1].clone()
+
+        # Repetition penalty on newly generated response tokens
+        if repetition_penalty is not None and repetition_penalty > 1.0:
+            for token_id in set(generated_ids[prompt_length:]):
+                if next_token_logits[token_id] > 0:
+                    next_token_logits[token_id] /= repetition_penalty
+                else:
+                    next_token_logits[token_id] *= repetition_penalty
 
         # Temperature
-        next_token_logits = (
-            next_token_logits / temperature
-        )
+        if temperature > 0:
+            next_token_logits = (
+                next_token_logits / temperature
+            )
 
         # Never generate structural tokens as normal text
         next_token_logits[bos_id] = float("-inf")

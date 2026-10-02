@@ -12,7 +12,8 @@ class Tokenizer:
         Convert text into tokens.
 
         Special tokens such as <USER> and <ASSISTANT>
-        are preserved as single tokens.
+        are preserved as single tokens. Numbers, currency amounts,
+        emails, phone numbers, and contractions are captured atomically.
         """
 
         special_pattern = (
@@ -20,14 +21,26 @@ class Tokenizer:
             r"<UNK>|<BOS>|<EOS>"
         )
 
+        currency_pattern = r"\$\d+(?:,\d+)*(?:\.\d+)?"
+        decimal_pattern = r"\b\d+\.\d+\b"
+        email_pattern = r"[\w\.-]+@[\w\.-]+\.\w+"
+        phone_pattern = r"\b(?:\d{1,4}-)?\d{3}-\d{3,4}\b"
+        contraction_pattern = r"\b\w+['’]\w+\b"
+
         pattern = (
             special_pattern +
+            r"|" + email_pattern +
+            r"|" + phone_pattern +
+            r"|" + currency_pattern +
+            r"|" + decimal_pattern +
+            r"|" + contraction_pattern +
             r"|\w+|[^\w\s]"
         )
 
         return re.findall(
             pattern,
-            text
+            text,
+            flags=re.IGNORECASE
         )
 
     def build_vocabulary(
@@ -102,7 +115,15 @@ class Tokenizer:
             for token_id in token_ids
         ]
 
-        return " ".join(tokens)
+        text = " ".join(tokens)
+        # Clean up spaces before punctuation
+        text = re.sub(r"\s+([.,!?:;])", r"\1", text)
+        # Clean up spaces inside hyphens, colons in time, and apostrophes
+        text = re.sub(r"(\w)\s*-\s*(\w)", r"\1-\2", text)
+        text = re.sub(r"(\d)\s*:\s*(\d)", r"\1:\2", text)
+        text = re.sub(r"(\w)\s*'\s*(\w)", r"\1'\2", text)
+        text = re.sub(r"\$\s+(\d)", r"$\1", text)
+        return text
 
     @property
     def vocab_size(self) -> int:

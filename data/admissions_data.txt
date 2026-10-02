@@ -1,0 +1,350 @@
+<USER> hello
+<ASSISTANT> hello! welcome to the college admissions office. how can i assist you with your application, requirements, or campus information today?
+
+<USER> hi
+<ASSISTANT> hi there! i am your college admissions assistant. feel free to ask about application deadlines, tuition, majors, requirements, and campus life.
+
+<USER> hey
+<ASSISTANT> hey! how can i help you with your college admissions questions today?
+
+<USER> what can you do?
+<ASSISTANT> i can answer your questions about undergraduate admission requirements, application deadlines, tuition costs, financial aid, scholarships, academic majors, housing, and campus visits.
+
+<USER> who are you?
+<ASSISTANT> i am the college admissions virtual assistant, here to guide prospective students and applicants through the college application and enrollment process.
+
+<USER> how can you help me?
+<ASSISTANT> i can help you check application deadlines, understand gpa and test requirements, explore academic majors, estimate tuition and financial aid, and learn about student housing.
+
+<USER> what are the general admission requirements?
+<ASSISTANT> undergraduate admission requires an official high school transcript, a completed common application, one personal essay, two letters of recommendation, and proof of graduation or equivalent.
+
+<USER> what do i need to apply?
+<ASSISTANT> to apply, you must submit the common application or university portal application, your official high school transcript, a personal essay, two recommendation letters, and the $65 application fee or fee waiver.
+
+<USER> what is the minimum gpa for admission?
+<ASSISTANT> the minimum recommended unweighted high school gpa for general admission is 3.0 on a 4.0 scale. competitive majors such as computer science and engineering typically look for a 3.5 gpa or higher.
+
+<USER> what gpa do i need to get in?
+<ASSISTANT> applicants generally need an unweighted high school gpa of 3.0 or higher. however, each application is reviewed holistically considering course rigor, extracurricular activities, and recommendations.
+
+<USER> can i get in with a low gpa?
+<ASSISTANT> we conduct holistic admissions reviews. if your gpa is below 3.0, strong letters of recommendation, upward grade trends, compelling essays, and extracurricular involvement can strengthen your application.
+
+<USER> what high school courses are required?
+<ASSISTANT> required high school coursework includes 4 years of english, 3 to 4 years of mathematics including algebra ii, 3 years of natural or lab science, 3 years of social sciences, and 2 years of a foreign language.
+
+<USER> what prerequisite classes do i need from high school?
+<ASSISTANT> prerequisites include 4 years of english, at least 3 years of mathematics through algebra ii, 3 years of lab science, 3 years of history or social studies, and 2 years of the same foreign language.
+
+<USER> is the sat or act required?
+<ASSISTANT> our university is test-optional. submitting sat or act scores is completely optional and students will not be disadvantaged if they choose not to submit test scores.
+
+<USER> do i have to take the sat?
+<ASSISTANT> no, standardized test scores are optional. you may choose whether or not to include sat or act scores as part of your application.
+
+<USER> what are average sat and act scores for admitted students?
+<ASSISTANT> for applicants who submit test scores, the middle 50% sat score range is 1250 to 1420, and the middle 50% act composite score range is 27 to 32.
+
+<USER> what is the average sat score?
+<ASSISTANT> the average sat score for enrolled students is approximately 1330, with middle 50% scores ranging between 1250 and 1420.
+
+<USER> what is the average act score?
+<ASSISTANT> the average act composite score is around 29, with the middle 50% of submitting students scoring between 27 and 32.
+
+<USER> how many letters of recommendation do i need?
+<ASSISTANT> we require two letters of recommendation: one from a high school guidance counselor and one from a core academic teacher who taught you in grades 10 through 12.
+
+<USER> who should write my recommendation letters?
+<ASSISTANT> your recommendation letters should come from your high school counselor and an academic teacher, preferably in english, math, science, social studies, or foreign language.
+
+<USER> do i need to write an essay?
+<ASSISTANT> yes, all applicants must submit a personal statement essay through the common application between 250 and 650 words.
+
+<USER> what is the college essay requirement?
+<ASSISTANT> applicants must submit one personal statement of 250 to 650 words chosen from the standard common application essay prompts. some specialized majors may require an additional supplemental essay.
+
+<USER> how do i submit my high school transcript?
+<ASSISTANT> official high school transcripts must be submitted directly by your high school counselor through electronic portals like naviance, parchment, scoir, or mailed in a sealed official envelope.
+
+<USER> can i send unofficial transcripts?
+<ASSISTANT> unofficial transcripts can be uploaded to your applicant portal for initial admissions review, but an official final high school transcript is required before enrollment.
+
+<USER> what is the application fee?
+<ASSISTANT> the undergraduate application fee is $65 for domestic applicants and $85 for international applicants.
+
+<USER> how much does it cost to apply?
+<ASSISTANT> the application fee is $65. fee waivers are readily available for eligible students who demonstrate financial need.
+
+<USER> can i get an application fee waiver?
+<ASSISTANT> yes, eligible students can receive an application fee waiver through the common application, college board, nacac, or by having their high school guidance counselor submit a fee waiver request.
+
+<USER> how do i qualify for a fee waiver?
+<ASSISTANT> you qualify for an application fee waiver if you participate in the federal free or reduced price lunch program, receive an sat or act fee waiver, or your family receives public assistance.
+
+<USER> when is the application deadline?
+<ASSISTANT> the regular decision application deadline is january 15th. early action deadline is november 1st, and early decision deadline is november 15th.
+
+<USER> what are the important deadlines?
+<ASSISTANT> key deadlines are november 1st for early action, november 15th for early decision, january 15th for regular decision, and february 1st for priority financial aid.
+
+<USER> when is the early action deadline?
+<ASSISTANT> the early action deadline is november 1st. early action is non-binding, and decisions are released by mid-december.
+
+<USER> what is early action?
+<ASSISTANT> early action is a non-binding application plan with a november 1st deadline that allows you to receive an admission decision early in mid-december without any obligation to enroll.
+
+<USER> when is the early decision deadline?
+<ASSISTANT> the early decision deadline is november 15th. early decision is a binding commitment, meaning you agree to enroll if accepted.
+
+<USER> what is early decision?
+<ASSISTANT> early decision is a binding agreement with a november 15th deadline. if admitted under early decision, you must withdraw all other applications and commit to attending.
+
+<USER> when is the regular decision deadline?
+<ASSISTANT> the regular decision deadline is january 15th, and admission decisions are announced by late march.
+
+<USER> when do admission decisions come out?
+<ASSISTANT> early action and early decision applicants receive decisions by mid-december. regular decision applicants receive their admission decisions by march 31st.
+
+<USER> when will i hear back about my application?
+<ASSISTANT> decisions for early rounds are sent in mid-december, while regular decision notices are published on the applicant portal by late march.
+
+<USER> what is the enrollment deposit deadline?
+<ASSISTANT> admitted students must submit their $300 enrollment deposit by may 1st, national college decision day, to secure their spot.
+
+<USER> when do i need to accept my admission offer?
+<ASSISTANT> you must accept your admission offer and submit the enrollment deposit by may 1st.
+
+<USER> how much is the enrollment deposit?
+<ASSISTANT> the enrollment deposit is $300, which is credited toward your first semester tuition and fees.
+
+<USER> how much is tuition?
+<ASSISTANT> annual undergraduate tuition is $18,500 for in-state residents and $32,000 for out-of-state and international students.
+
+<USER> what is the tuition fee?
+<ASSISTANT> tuition is $18,500 per academic year for in-state students and $32,000 per academic year for out-of-state students.
+
+<USER> what is the total cost of attendance?
+<ASSISTANT> total estimated annual cost of attendance, including tuition, room, board, books, and fees, is $34,000 for in-state residents and $48,000 for out-of-state students.
+
+<USER> how much does it cost per year?
+<ASSISTANT> the estimated total cost per year is $34,000 for in-state students and $48,000 for out-of-state students, including on-campus housing and dining.
+
+<USER> how do i apply for financial aid?
+<ASSISTANT> to apply for financial aid, submit the fafsa online at studentaid.gov using our federal school code 001234 by the priority deadline of february 1st.
+
+<USER> what is the fafsa deadline?
+<ASSISTANT> the priority deadline to submit the fafsa for maximum financial aid consideration is february 1st.
+
+<USER> what is the school code for fafsa?
+<ASSISTANT> our federal fafsa school code is 001234. please list this code on your fafsa application so we receive your aid report.
+
+<USER> do you offer scholarships?
+<ASSISTANT> yes, all admitted undergraduate students are automatically considered for merit scholarships ranging from $3,000 to $15,000 per year based on academic performance.
+
+<USER> how do i apply for merit scholarships?
+<ASSISTANT> merit scholarships do not require a separate application. all applicants are automatically evaluated based on their high school gpa, course rigor, and application materials.
+
+<USER> are there scholarships for out-of-state students?
+<ASSISTANT> yes, out-of-state students are eligible for competitive merit scholarships up to $15,000 annually to help offset the difference in tuition.
+
+<USER> do you offer need-based financial aid?
+<ASSISTANT> yes, need-based financial assistance including institutional grants, federal pell grants, and subsidized loans are awarded based on your fafsa results.
+
+<USER> is work-study available?
+<ASSISTANT> yes, students eligible for federal work-study can work up to 20 hours per week in campus departments, libraries, laboratories, and student centers.
+
+<USER> what academic majors do you offer?
+<ASSISTANT> we offer more than 70 undergraduate majors across the college of arts and sciences, college of engineering, school of business, and school of health sciences.
+
+<USER> what programs can i study?
+<ASSISTANT> you can study popular programs in computer science, mechanical engineering, business administration, biology, nursing, psychology, communications, and data science.
+
+<USER> tell me about the computer science major.
+<ASSISTANT> the computer science major offers hands-on tracks in artificial intelligence, software engineering, cybersecurity, and data science, with strong industry internship placements.
+
+<USER> what is the computer science program like?
+<ASSISTANT> our computer science curriculum covers algorithms, systems programming, web technologies, and machine learning, supported by modern computing labs and tech career fairs.
+
+<USER> tell me about the engineering program.
+<ASSISTANT> the college of engineering offers abet-accredited degrees in mechanical, electrical, civil, biomedical, and chemical engineering with state-of-the-art research facilities.
+
+<USER> is the engineering school abet accredited?
+<ASSISTANT> yes, all undergraduate engineering programs are fully accredited by abet, ensuring rigorous academic and professional standards.
+
+<USER> tell me about the business school.
+<ASSISTANT> the school of business is aacsb-accredited, offering specialized majors in finance, marketing, accounting, management, and business analytics.
+
+<USER> can i apply as an undecided major?
+<ASSISTANT> yes, you can apply as exploratory or undecided. you will work with dedicated academic advisors and have until the end of your sophomore year to declare a major.
+
+<USER> can i double major?
+<ASSISTANT> yes, students in good academic standing can pursue a double major or add a minor by consulting with their academic advisor after their first semester.
+
+<USER> can i minor in another subject?
+<ASSISTANT> yes, we offer over 50 academic minors across various disciplines that complement your primary major.
+
+<USER> is on-campus housing guaranteed?
+<ASSISTANT> yes, on-campus housing is guaranteed for all incoming first-year undergraduate students who submit their housing application by june 1st.
+
+<USER> do freshmen have to live on campus?
+<ASSISTANT> yes, all first-year freshmen are required to live in university residence halls, unless they live within 20 miles with a parent or legal guardian.
+
+<USER> what are the residence halls like?
+<ASSISTANT> residence halls offer furnished double and single rooms, suite-style living, high-speed wi-fi, air conditioning, study lounges, communal kitchens, and laundry facilities.
+
+<USER> how do meal plans work?
+<ASSISTANT> on-campus freshmen are enrolled in an unlimited dining meal plan, which includes unlimited access to the three campus dining commons and dining dollars for on-campus cafes.
+
+<USER> what dining options are available?
+<ASSISTANT> campus features three main dining commons with vegetarian, vegan, halal, and allergen-free stations, plus popular cafes, retail food courts, and coffee shops.
+
+<USER> can i bring a car as a freshman?
+<ASSISTANT> freshmen are generally not permitted to bring cars to campus, but campus shuttles, local public transit, and bicycle sharing programs provide easy transportation.
+
+<USER> what student clubs are there?
+<ASSISTANT> we have over 200 active student organizations, including student government, academic clubs, cultural societies, performing arts groups, club sports, and greek life.
+
+<USER> can i tour the campus?
+<ASSISTANT> yes, in-person guided walking tours and admissions information sessions are held monday through saturday. you can register on our website.
+
+<USER> do you offer campus tours?
+<ASSISTANT> guided campus tours led by student ambassadors are available six days a week. virtual 360-degree interactive tours are also available on our website anytime.
+
+<USER> how do i schedule a campus visit?
+<ASSISTANT> you can schedule an in-person or virtual campus visit through our admissions website under the visit campus tab.
+
+<USER> can i apply as a transfer student?
+<ASSISTANT> yes, we welcome transfer applicants who have completed at least 24 college credit hours with a minimum cumulative college gpa of 2.75 from an accredited institution.
+
+<USER> what are the transfer admission requirements?
+<ASSISTANT> transfer applicants must submit official transcripts from all colleges attended, a minimum 2.75 college gpa, a college report, and a statement of interest.
+
+<USER> when is the transfer application deadline?
+<ASSISTANT> the fall transfer application deadline is april 1st, and the spring transfer application deadline is november 1st.
+
+<USER> how do my college credits transfer?
+<ASSISTANT> college courses with a grade of c or better from accredited colleges are generally eligible for transfer credit, and an official credit evaluation is provided upon admission.
+
+<USER> do you accept international students?
+<ASSISTANT> yes, we have a vibrant international student community representing over 80 countries worldwide.
+
+<USER> what are the requirements for international applicants?
+<ASSISTANT> international applicants must submit academic records with certified english translations, proof of english language proficiency, a copy of their passport, and financial documentation for the i-20.
+
+<USER> what english test scores are accepted?
+<ASSISTANT> we accept toefl ibt with a minimum score of 80, ielts with a minimum score of 6.5, or the duolingo english test with a minimum score of 110.
+
+<USER> what is the minimum toefl score?
+<ASSISTANT> the minimum required toefl ibt score is 80 for undergraduate admission.
+
+<USER> what is the minimum ielts score?
+<ASSISTANT> the minimum overall band score for ielts is 6.5 with no individual band below 6.0.
+
+<USER> what is the minimum duolingo score?
+<ASSISTANT> the minimum required duolingo english test score is 110.
+
+<USER> how do i get a student visa?
+<ASSISTANT> once admitted, submit your financial certification and passport copy to our international office to receive your form i-20, which you take to the u.s. embassy for your f-1 visa interview.
+
+<USER> how do i check my application status?
+<ASSISTANT> you can check your application status and missing documents at any time by logging into your online applicant portal using your university id and password.
+
+<USER> how do i contact the admissions office?
+<ASSISTANT> you can email undergraduate admissions at admissions@university.edu or call our office at 1-800-555-0199 monday through friday from 8:30 am to 5:00 pm eastern time.
+
+<USER> what is the admissions email address?
+<ASSISTANT> the admissions email address is admissions@university.edu. we respond to student inquiries within one to two business days.
+
+<USER> what is the admissions phone number?
+<ASSISTANT> the office of admissions can be reached by phone at 1-800-555-0199 or 555-0123 during normal business hours.
+
+<USER> what are the admissions office hours?
+<ASSISTANT> the admissions office is open monday through friday from 8:30 am to 5:00 pm eastern time, located in hall hall room 101.
+
+<USER> what is the admissions mailing address?
+<ASSISTANT> mail official transcripts and documents to: office of undergraduate admissions, hall hall room 101, 100 university avenue, college town, state 12345.
+
+<USER> do you offer online classes?
+<ASSISTANT> most undergraduate degree programs are primarily in-person and residential, though select summer terms and general education courses are offered online.
+
+<USER> can i defer my admission?
+<ASSISTANT> yes, admitted students can request a one-year gap year or admission deferral by submitting a deferral request form and non-refundable deposit by july 1st.
+
+<USER> what is the student-to-faculty ratio?
+<ASSISTANT> our student-to-faculty ratio is 14 to 1, with over 75% of undergraduate classes having fewer than 30 students.
+
+<USER> are internships available?
+<ASSISTANT> yes, our career center partners with over 500 employer organizations to provide internship, co-op, and research opportunities for students across all majors.
+
+<USER> what happens after i am accepted?
+<ASSISTANT> after acceptance, celebrate! then log into your portal to accept your offer, submit your $300 deposit by may 1st, register for orientation, and apply for housing.
+
+<USER> can freshmen live off campus?
+<ASSISTANT> all first-year freshmen are required to live on campus in university residence halls unless they live within 20 miles with a parent or legal guardian.
+
+<USER> where can i visit the campus?
+<ASSISTANT> you can schedule an in-person or virtual campus visit through our admissions website under the visit campus tab.
+
+<USER> can i visit the university?
+<ASSISTANT> yes, in-person campus walking tours and admissions information sessions are held monday through saturday. you can register on our website.
+
+<USER> what happens if my gpa is low?
+<ASSISTANT> we conduct holistic admissions reviews. if your gpa is below 3.0, strong letters of recommendation, upward grade trends, compelling essays, and extracurricular involvement can strengthen your application.
+
+<USER> my gpa is low
+<ASSISTANT> we conduct holistic admissions reviews. if your gpa is below 3.0, strong letters of recommendation, upward grade trends, compelling essays, and extracurricular involvement can strengthen your application.
+
+<USER> what if my gpa is below 3.0?
+<ASSISTANT> we conduct holistic admissions reviews. if your gpa is below 3.0, strong letters of recommendation, upward grade trends, compelling essays, and extracurricular involvement can strengthen your application.
+
+<USER> where is the campus located?
+<ASSISTANT> our main campus is located at 100 university avenue in college town, featuring historic brick buildings, modern research labs, and green quads.
+
+<USER> where is the college?
+<ASSISTANT> our campus is located at 100 university avenue in college town, state 12345.
+
+<USER> what is the acceptance rate?
+<ASSISTANT> our overall undergraduate acceptance rate is approximately 48%, reflecting a competitive and academically motivated applicant pool.
+
+<USER> how selective is the university?
+<ASSISTANT> our admissions process is selective with an overall acceptance rate of approximately 48%.
+
+<USER> can i change my major later?
+<ASSISTANT> yes, students can request to change their major after completing their first semester by speaking with their academic advisor and department chair.
+
+<USER> how do i submit my application?
+<ASSISTANT> you can submit your application online through the common application or directly through our university admissions web portal.
+
+<USER> where do i apply?
+<ASSISTANT> you can apply online by visiting our admissions website or by selecting our institution on the common application.
+
+<USER> what if i miss the deadline?
+<ASSISTANT> if you miss a deadline, please contact the admissions office immediately at admissions@university.edu or 1-800-555-0199 to inquire about late submissions or spring admission.
+
+<USER> can i apply for spring semester?
+<ASSISTANT> yes, spring admission applications are open for transfer and select first-year students with a deadline of november 1st.
+
+<USER> what sports and athletics do you offer?
+<ASSISTANT> we offer ncaa division ii varsity athletics, competitive club sports, and recreational intramural leagues including soccer, basketball, track, and volleyball.
+
+<USER> is there financial aid for international students?
+<ASSISTANT> international students are eligible for competitive merit scholarships up to $15,000 per year, but are not eligible for u.s. federal financial aid.
+
+<USER> how do i pay for tuition?
+<ASSISTANT> tuition payments can be made online through the student account portal via electronic bank transfer, credit card, or by setting up a monthly installment payment plan.
+
+<USER> who can i call for help?
+<ASSISTANT> you can call our admissions counseling team toll-free at 1-800-555-0199 or email admissions@university.edu for one-on-one assistance.
+
+<USER> thanks
+<ASSISTANT> you are very welcome! best of luck with your college journey. feel free to ask if you have any more questions about admissions.
+
+<USER> thank you
+<ASSISTANT> you are welcome! don't hesitate to reach out if you need any more help with your application. good luck!
+
+<USER> bye
+<ASSISTANT> goodbye! feel free to return anytime with questions about college admissions. have a wonderful day!
+
+<USER> quit
+<ASSISTANT> goodbye! thank you for visiting the college admissions office.
