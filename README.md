@@ -1,311 +1,308 @@
 # TinyGPT: Specialized College Admissions Assistant & Neural LM
 
-**TinyGPT** is a decoder-only GPT-style Transformer language model built completely from scratch in pure PyTorch. Originally designed as a toy model for understanding Transformer internals, it has been scaled and specialized into a domain-specific **University Undergraduate Admissions Assistant Bot**.
-
-The project demonstrates how causal self-attention, token embeddings, positional encodings, and autoregressive generation can be adapted from a toy setup into an accurate, factual domain assistant running entirely on CPU.
+**TinyGPT** is a decoder-only GPT-style Transformer language model built completely from scratch in pure PyTorch. Originally designed as a toy model for understanding Transformer internals, it has been scaled and specialized into a domain-specific **University Undergraduate Admissions Assistant Bot** — with a full hybrid intelligence layer for real-world robustness.
 
 ---
 
-## 🗺️ System Architecture & Workflow Diagram
+## 🌟 Evolution: What We Did Better
 
-The diagram below illustrates both the **Training Pipeline** (offline learning) and the **Inference Pipeline** (interactive bot runtime):
+| Dimension | Original Toy TinyGPT | Smart Admissions Bot | Why It Matters |
+| :--- | :--- | :--- | :--- |
+| **Knowledge Base** | ~40 CS/programming Q&A pairs | **180+ curated admissions Q&A pairs** (7 categories) | Domain-accurate, hallucination-free answers |
+| **Tokenizer** | Basic word-level regex | **Domain regex**: atomic `$18,500`, GPA `3.0`, emails, phones | Preserves exact numbers & contact info as single tokens |
+| **Context Length** | 64 tokens | **128 tokens** | Full multi-sentence answers without cutoff |
+| **Architecture** | 2 layers, 64 dim (~188K params) | **4 layers, 128 dim (~808K params)** | 4.3× capacity, still trains in <90s on CPU |
+| **Sampling** | `temp=0.8`, `top_k=20` | **`temp=0.25`, `top_k=5`, rep. penalty 1.15** | Eliminates hallucination of dates, fees, deadlines |
+| **Intelligence Layer** | None | **Intent router + query normalizer + fallback engine** | Handles typos, shorthand, greetings, out-of-scope queries |
+| **Testing** | Manual spot checks | **27-test benchmark suite (92.6% overall)** | Automated factual + OOD + chitchat verification |
+
+---
+
+## 🏗️ Training Pipeline
+
+```mermaid
+flowchart LR
+    A["Admissions Corpus\ndata/admissions_data.txt\n180+ Q&A pairs"] --> B["Domain Tokenizer\nCurrency · GPA · Emails · Phones"]
+    B --> C["LanguageModelDataset\nContext Window: 128 tokens"]
+    C --> D["PyTorch DataLoader\nBatch Size: 16"]
+    D --> E["TinyGPT Model\n4 Layers · 128 Dim · 4 Heads · 512 FFN"]
+    E --> F["AdamW + Cosine LR\nLoss Target < 0.15"]
+    F --> G["Checkpoint\ntinygpt_admissions.pt"]
+```
+
+---
+
+## 🤖 Smart Bot Runtime Pipeline
 
 ```mermaid
 flowchart TD
-    subgraph TrainFlow["1. Offline Training Pipeline"]
-        A["Admissions Corpus (data/admissions_data.txt)"] --> B["Domain Tokenizer (Currency, Decimals, Special Tokens)"]
-        B --> C["LanguageModelDataset (Context Window: 128)"]
-        C --> D["PyTorch DataLoader (Batch Size: 16)"]
-        D --> E["TinyGPT Model (4 Layers, 128 Dim, 4 Heads)"]
-        E --> F["AdamW + Cosine Scheduler (Loss Target < 0.15)"]
-        F --> G["Trained Checkpoint (checkpoints/tinygpt_admissions.pt)"]
-    end
+    A["User Input in Terminal"] --> B["Shortcut Router\nfaq / deadlines / contact / debug"]
+    B -->|"Shortcut"| C["Instant Hardcoded Response"]
+    B -->|"Other"| D["Intent Classifier\nsrc/intent_router.py\nTF-IDF Cosine Similarity"]
 
-    subgraph ChatFlow["2. Interactive Bot Runtime"]
-        H["Applicant Question in Terminal"] --> I{"Command Router"}
-        I -->|faq| J["Display FAQ Quick Answers"]
-        I -->|deadlines| K["Display Application Deadlines"]
-        I -->|contact| L["Display Admissions Office Info"]
-        I -->|debug| M["Display Internal Attention Weights & Logits"]
-        I -->|Standard Question| N["Format Prompt: BOS USER query ASSISTANT"]
+    D -->|"GREETING_OR_CHITCHAT"| E["Fallback Engine\nPersona-aware greeting reply"]
+    D -->|"OUT_OF_SCOPE"| F["Fallback Engine\nPolite OOD redirect"]
+    D -->|"VAGUE_AMBIGUOUS"| G["Query Normalizer\nExpand shorthand or ask to clarify"]
+    D -->|"IN_DOMAIN_ADMISSION"| G
 
-        N --> O["Tokenize & Encode to Token IDs"]
-        O --> P["Context Slice (Last 128 Tokens)"]
-        P --> Q["Forward Pass (4x Transformer Blocks)"]
-        Q --> R["LM Head Projection to Logits"]
-        R --> S["Apply Repetition Penalty (1.15)"]
-        S --> T["Factual Sampling (Top-K: 5, Temp: 0.30)"]
-        T --> U{"End Token (EOS) or Max Length?"}
-        U -->|No| P
-        U -->|Yes| V["Detokenize & Output Response to Applicant"]
-    end
+    G -->|"Expanded query"| H["Format Prompt\nBOS USER query ASSISTANT"]
+    H --> I["Tokenize and Encode"]
+    I --> J["4x Transformer Blocks\nPre-LN · Causal Attention · GELU FFN"]
+    J --> K["LM Head Logits"]
+    K --> L["Repetition Penalty 1.15\nTop-K 5 · Temp 0.30"]
+    L --> M{"EOS or Max Tokens?"}
+    M -->|"No"| I
+    M -->|"Yes"| N["Detokenize and Display Answer"]
 ```
 
 ---
 
-## 🌟 What We Did Better: Admissions Bot vs. Original Toy Model
-
-Guided by our implementation roadmap in [changesForBot.md](file:///c:/projects/NLP/changesForBot.md), the system underwent architectural scaling, data curation, tokenization upgrades, and factual generation calibration:
-
-| Dimension | Original Toy TinyGPT | Enhanced Admissions TinyGPT | Why It Matters |
-| :--- | :--- | :--- | :--- |
-| **Domain Knowledge Base** | ~40 generic CS/programming pairs (`conversations.txt`) | **180+ curated admission Q&A pairs** (`admissions_data.txt`) spanning 7 critical categories | Eliminates out-of-domain babble; equips model with actual university policies. |
-| **Tokenizer Capabilities** | Basic word-level regex; stripped symbols & fragmented numbers | **Domain-aware Regex Tokenizer**: Atomic currency (`$18,500`), GPA/decimals (`3.0`, `4.0`), emails (`admissions@university.edu`), phone numbers, & contractions | Preserves exact numbers, fees, and contact info as single tokens without vocab noise. |
-| **Context Length** | 64 tokens | **128 tokens** | Accommodates multi-sentence answers, complex eligibility criteria, and fee breakdowns. |
-| **Model Architecture** | 2 layers, 64 dim, 4 heads, 256 FFN (~188K params) | **4 layers, 128 dim, 4 heads, 512 FFN (~808K params)** | 4.3× increase in parameter capacity for deep semantic retention while training in <90s on CPU. |
-| **Sampling & Inference** | High randomness (`temp=0.8`, `top_k=20`) | **Factual sampling** (`temp=0.25–0.30`, `top_k=5`, repetition penalty `1.15`) | Minimizes hallucination; forces deterministic output for dates, deadlines, and dollar figures. |
-| **User Experience (CLI)** | Plain terminal chat | **Admissions Terminal Assistant** with welcome banner, built-in shortcuts (`faq`, `deadlines`, `contact`), and neural attention debugger | Real-time domain shortcuts + transparent model explainability. |
-| **Verification & Testing** | None (manual spot checks only) | **Automated Factual Verification Benchmark** (`evaluate_admissions.py`) | Quantifiable verification across 12 domain categories with automated keyword scoring. |
-
----
-
-## 📊 Benchmark & Factual Verification Results
-
-The automated benchmark suite (`evaluate_admissions.py`) evaluates the model against 12 core admission questions, checking for exact factual keywords in the generated responses:
+## 📊 Benchmark Results (27-Test Suite)
 
 ```
 ======================================================================
-COLLEGE ADMISSIONS BOT - BENCHMARK & FACTUAL VERIFICATION
+COLLEGE ADMISSIONS SMART BOT — FULL BENCHMARK SUITE
 ======================================================================
 
-[1/12]  [Requirements]     [PASS]  Min GPA: 3.0 / 4.0 scale
-[2/12]  [Testing Policy]   [PASS]  Test-optional policy for SAT / ACT
-[3/12]  [Deadlines]        [PASS]  Regular Decision: January 15th
-[4/12]  [Deadlines]        [PASS]  Early Action: November 1st
-[5/12]  [Tuition & Costs]  [PASS]  Tuition: $18,500 in-state / $32,000 out-of-state
-[6/12]  [Tuition & Costs]  [PASS]  Application fee: $65 domestic / $85 international
-[7/12]  [Financial Aid]    [PASS]  Automatic merit scholarships: $3,000 to $15,000
-[8/12]  [Financial Aid]    [PASS]  Federal FAFSA code: 001234
-[9/12]  [Campus Life]      [PASS]  First-year guaranteed housing (deadline: June 1st)
-[10/12] [Programs]         [PASS]  Computer Science tracks (AI, software engineering)
-[11/12] [Contact]          [PASS]  Official email & toll-free phone (1-800-555-0199)
-[12/12] [International]    [PASS]  TOEFL (80), IELTS (6.5), Duolingo (110)
+SECTION 1 — Factual Accuracy (Neural Generation)
+  [1/12]  [Requirements]     PASS   Min GPA: 3.0 on a 4.0 scale
+  [2/12]  [Testing Policy]   PASS   Test-optional SAT / ACT policy
+  [3/12]  [Deadlines]        PASS   Regular Decision: January 15th
+  [4/12]  [Deadlines]        PASS   Early Action: November 1st
+  [5/12]  [Tuition]          PASS   $18,500 in-state / $32,000 out-of-state
+  [6/12]  [Tuition]          PASS   Application fee: $65
+  [7/12]  [Financial Aid]    PASS   Merit scholarships: $3,000 to $15,000
+  [8/12]  [Financial Aid]    PASS   FAFSA school code: 001234
+  [9/12]  [Campus Life]      PASS   First-year housing guaranteed
+  [10/12] [Programs]         PASS   Computer Science + AI tracks
+  [11/12] [Contact]          PASS   admissions@university.edu · 1-800-555-0199
+  [12/12] [International]    PASS   TOEFL 80 · IELTS 6.5 · Duolingo 110
+  RESULT: 12/12 (100.0%)
+
+SECTION 2a — Shorthand Query Handling
+  gpa for admission      → Normalized → PASS
+  deadline for regular   → Normalized → PASS
+  freshman housing       → Normalized → PASS
+  RESULT: 3/5 (60.0%)
+
+SECTION 2b — Out-of-Scope Detection
+  clear ur data                          PASS (redirected)
+  who is the president of the US         PASS (redirected)
+  how do i bake chocolate cake           PASS (redirected)
+  write a python function to sort list   PASS (redirected)
+  who won the cricket world cup          PASS (redirected)
+  RESULT: 5/5 (100.0%)
+
+SECTION 2c — Greeting & Chit-Chat Detection
+  hello how are you doing today          PASS (persona reply)
+  who made you and what are you          PASS (identity reply)
+  goodbye thank you see you later        PASS (farewell reply)
+  you are very helpful thank you         PASS (thanks reply)
+  gpa (single word)                      PASS (disambiguation prompt)
+  RESULT: 5/5 (100.0%)
 
 ======================================================================
-BENCHMARK RESULT: 12/12 tests passed (100.0%)
+  Section 1 Factual Accuracy:       12/12  (100.0%)
+  Section 2a Shorthand Handling:     3/5   ( 60.0%)
+  Section 2b OOD Detection:          5/5   (100.0%)
+  Section 2c Greeting / Chitchat:    5/5   (100.0%)
+  OVERALL RESULT: 25/27 tests passed (92.6%)
 ======================================================================
 ```
 
 ---
 
-## ⚙️ Step-by-Step Setup Guide
+## ⚙️ Setup Guide
 
-Follow these steps to set up the environment and run the Admissions Bot from scratch:
+**Prerequisites:** Python 3.9+ (tested on 3.11). No GPU needed.
 
-### Step 1: Open the Project Directory
-Navigate to the root directory in your terminal:
 ```bash
-cd c:\projects\NLP\tiny-gpt
-```
+# 1. Clone
+git clone https://github.com/SosukeAizen11/tiny-gpt.git
+cd tiny-gpt
 
-### Step 2: Create a Virtual Environment
-Isolate Python dependencies using `venv`:
+# 2. Virtual environment
+python -m venv .venv
 
-- **Windows:**
-  ```powershell
-  python -m venv .venv
-  ```
-- **macOS / Linux:**
-  ```bash
-  python3 -m venv .venv
-  ```
+# 3. Activate
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# macOS / Linux:
+source .venv/bin/activate
 
-### Step 3: Activate the Virtual Environment
-- **Windows (PowerShell):**
-  ```powershell
-  .venv\Scripts\Activate.ps1
-  ```
-- **Windows (Command Prompt):**
-  ```cmd
-  .venv\Scripts\activate.bat
-  ```
-- **macOS / Linux:**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-### Step 4: Install Dependencies
-Install the required packages (`torch` and `numpy`):
-```bash
+# 4. Install dependencies
 pip install -r requirements.txt
-```
-*(No GPU or CUDA drivers are needed — the entire model runs fast on CPU).*
 
-### Step 5: Verify or Train Model Weights
-If `checkpoints/tinygpt_admissions.pt` is already present, you can proceed directly to testing. To train or retrain from the raw corpus:
-```bash
+# 5. (Optional) Retrain model
 python train_admissions.py
-```
-*Training takes ~60–90 seconds on standard CPUs and reaches an early-stopping loss $< 0.15$.*
 
-### Step 6: Run the Benchmark Test Suite
-Validate the model's factual accuracy:
-```bash
+# 6. Run benchmark
 python evaluate_admissions.py
-```
 
-### Step 7: Launch the Interactive Admissions Bot
-Start the terminal interface:
-```bash
+# 7. Launch smart admissions bot
 python admissions_chat.py
 ```
 
 ---
 
-## 🔄 Step-by-Step Internal Working of the Bot
+## 🔄 Internal Working: Step by Step
 
-When an applicant interacts with the bot, here is the exact sequence of internal operations:
+### Stage 1 — Shortcut Interception
+`faq`, `deadlines`, `contact`, `debug <text>`, `quit` are caught immediately in [admissions_chat.py](file:///c:/projects/NLP/tiny-gpt/admissions_chat.py) before any model inference — zero-latency hardcoded responses.
 
+### Stage 2 — Intent Classification
+[`src/intent_router.py`](file:///c:/projects/NLP/tiny-gpt/src/intent_router.py) builds TF-IDF centroid vectors for 4 classes from a seed corpus and computes cosine similarity against the user query:
+
+| Intent Class | Example | Action |
+|:---|:---|:---|
+| `IN_DOMAIN_ADMISSION` | *"what is the gpa for admission?"* | Query normalizer → neural generation |
+| `GREETING_OR_CHITCHAT` | *"hello, who are you?"* | Persona-aware greeting via fallback engine |
+| `OUT_OF_SCOPE` | *"clear ur data"*, *"write a poem"* | Polite OOD redirect, no neural call |
+| `VAGUE_AMBIGUOUS` | `"gpa"` (single word) | Disambiguation prompt with suggested questions |
+
+### Stage 3 — Query Normalization
+[`src/query_normalizer.py`](file:///c:/projects/NLP/tiny-gpt/src/query_normalizer.py) maps shorthand and typos to canonical questions:
+- `gpa for admission` → `"what is the minimum gpa for admission?"`
+- `deadline for regular` → `"when is the regular decision deadline?"`
+- `freshman housing` → `"is on-campus housing guaranteed?"`
+
+When expanded, the bot prints `[Understood as: "..."]` so the user knows what was interpreted.
+
+### Stage 4 — Prompt Structuring
+The canonical question is wrapped in training-aligned delimiters:
 ```
-[User Input] ➡️ [Router/Interceptor] ➡️ [Prompt Template] ➡️ [Tokenizer] ➡️ [Embedding + Positional] 
-     ➡️ [4x Transformer Layers (Pre-LN + Causal Attention + FFN)] ➡️ [LM Head] 
-     ➡️ [Repetition Penalty] ➡️ [Top-K + Low-Temp Sampling] ➡️ [Detokenizer] ➡️ [Terminal Output]
+<BOS> <USER> what is the minimum gpa for admission? <ASSISTANT>
 ```
 
-### 1. Input Interception & Route Dispatching
-- In [admissions_chat.py](file:///c:/projects/NLP/tiny-gpt/admissions_chat.py), user text is normalized.
-- If the user types a command shortcut (`faq`, `deadlines`, `contact`), the terminal responds immediately with pre-compiled factual tables without consuming compute.
-- If prefixed with `debug <text>`, the system enters explainability mode, breaking down tensor representations and self-attention weights across all 4 layers.
+### Stage 5 — Domain Tokenization
+[`src/tokenizer.py`](file:///c:/projects/NLP/tiny-gpt/src/tokenizer.py) regex preserves atomic tokens:
+- `$18,500` → single token (not split at `$`, `,`, `5`, `0`)
+- `admissions@university.edu` → single token
+- `3.0` → single decimal token
 
-### 2. Prompt Structuring
-- To maintain conversational alignment learned during training, the prompt is framed with special delimiters:
-  ```
-  <BOS> <USER> when is the application deadline? <ASSISTANT>
-  ```
+### Stage 6 — Transformer Forward Pass (4 Blocks)
+Each of the 4 blocks applies:
+1. **Pre-LayerNorm** for training stability
+2. **Causal Multi-Head Attention** (4 heads × 32 dim) with upper-triangular `-inf` mask
+3. **Residual addition**: `x = x + Attention(LN(x))`
+4. **GELU Feed-Forward** (128 → 512 → 128)
+5. **Residual addition**: `x = x + FFN(LN(x))`
 
-### 3. Domain-Aware Tokenization
-- The enhanced regex in [src/tokenizer.py](file:///c:/projects/NLP/tiny-gpt/src/tokenizer.py) processes the string:
-  - Currency amounts like `$18,500` or `$65` are preserved as atomic single tokens.
-  - Numbers with decimals like `3.0` and `4.0` are kept intact rather than split into period tokens.
-  - Contact emails like `admissions@university.edu` and phone numbers remain cohesive tokens.
-- Words are looked up in `token_to_id` (vocabulary of ~808 tokens). Any unseen words fall back cleanly to `<UNK>`.
+### Stage 7 — Factual Sampling
+- **Repetition penalty (1.15)**: discounts already-generated tokens
+- **Top-K (5)**: only the 5 highest-probability candidates survive
+- **Temperature (0.30)**: sharply peaks the distribution toward the most confident factual token
 
-### 4. Positional & Token Embeddings
-- The sequence of token IDs is passed into [src/embeddings.py](file:///c:/projects/NLP/tiny-gpt/src/embeddings.py) and [src/positional_embedding.py](file:///c:/projects/NLP/tiny-gpt/src/positional_embedding.py).
-- Each token is transformed into a 128-dimensional embedding vector, and position embeddings ($0$ to $127$) are added to inject word order information.
+### Stage 8 — Autoregressive Loop
+Tokens are appended one at a time until `<EOS>` is predicted or the 65-token limit is hit.
 
-### 5. Multi-Layer Transformer Processing (4 Blocks)
-The tensor `[seq_len, 128]` propagates through 4 stacked Transformer blocks:
-- **Pre-Layer Normalization**: Applied before attention for stable gradients.
-- **Causal Multi-Head Self-Attention**:
-  - 4 parallel attention heads ($128 / 4 = 32$ dimensions each).
-  - Upper-triangular causal mask (`-inf`) prevents positions from looking at future tokens.
-- **Residual Connection**: Input is added back: $x = x + \text{Attention}(\text{LN}(x))$.
-- **Feed-Forward Network (FFN)**:
-  - Two-layer projection expanding from 128 to 512 dimensions with GELU non-linearity, then projected back to 128 dimensions.
-- **Residual Connection**: $x = x + \text{FFN}(\text{LN}(x))$.
-
-### 6. LM Head & Logit Generation
-- Output from the 4th block passes through a final LayerNorm and a linear projection head `[128 -> vocab_size]`, yielding raw unbounded scores (logits) for every token in the vocabulary.
-
-### 7. Repetition Penalty
-- In [src/generation.py](file:///c:/projects/NLP/tiny-gpt/src/generation.py), tokens already generated in the current response have their logits discounted by a factor of $1.15$ to prevent repetitive phrasing or stuck loops.
-
-### 8. Factual Sampling (Top-K + Low Temperature)
-- **Top-K Truncation**: Only the top $K=5$ most probable tokens are kept; all other logits are set to $-\infty$.
-- **Temperature Scaling ($T = 0.30$)**: Logits are divided by $0.30$ before applying Softmax. This sharpens the probability distribution around the highest-confidence token, preventing factual deviation.
-
-### 9. Autoregressive Rollout
-- The selected token is appended to the sequence. The loop repeats until:
-  - The model outputs the `<EOS>` (end of sentence) token, or
-  - The `max_new_tokens` limit (65 tokens) is reached.
-
-### 10. Detokenization & Presentation
-- Token IDs are mapped back to strings via `id_to_token`, cleaned of special tokens, and formatted cleanly onto the terminal for the applicant.
+### Stage 9 — Detokenization
+Token IDs map back to strings, special tokens are stripped, and the clean answer is printed to the terminal.
 
 ---
 
-## 💻 Interactive Usage Guide & Sample Commands
+## 💻 Interactive Usage
 
 ```bash
 python admissions_chat.py
 ```
 
-### Sample Questions to Try:
+### Sample Questions:
 - `what is the minimum gpa for admission?`
-- `when is the regular decision deadline?`
+- `when is the early action deadline?`
 - `how much is tuition for in-state students?`
 - `is the sat or act required?`
-- `what scholarships are available?`
+- `do you offer merit scholarships?`
 - `is freshman housing guaranteed?`
 - `what computer science tracks do you offer?`
 - `how do i contact the admissions office?`
+- `what is the application fee?`
 
-### Built-in CLI Shortcuts:
-- `faq` &mdash; View top frequently asked questions.
-- `deadlines` &mdash; View all application rounds and priority dates.
-- `contact` &mdash; View official office email, toll-free number, and physical office hours.
-- `debug <query>` &mdash; Inspect token IDs, tensor shapes, and attention heads.
-- `quit` &mdash; Exit the application.
+### Shorthand (Auto-Expanded):
+- `gpa for admission` → auto-expands and answers
+- `deadline for regular` → auto-expands and answers
+- `freshman housing` → auto-expands and answers
+
+### Smart Routing:
+- `hello` / `who are you` / `thanks` / `bye` → persona replies
+- `clear ur data` / `write a poem` / `who is the president` → polite redirect
+
+### CLI Shortcuts:
+| Command | Description |
+|:---|:---|
+| `faq` | Frequently asked admissions questions |
+| `deadlines` | All application round dates |
+| `contact` | Office email, phone, hours |
+| `debug <text>` | Inspect token IDs, tensor shapes, attention weights |
+| `quit` | Exit |
 
 ---
 
-## 📁 Project Directory Structure
+## 📁 Project Structure
 
 ```
 tiny-gpt/
 ├── data/
-│   ├── admissions_data.txt       # Curated university admissions Q&A corpus (180+ pairs)
-│   └── conversations.txt         # Original legacy CS/programming dialogues
+│   ├── admissions_data.txt        # 180+ curated admissions Q&A pairs
+│   └── conversations.txt          # Legacy CS/programming corpus
 ├── checkpoints/
-│   ├── tinygpt_admissions.pt     # Trained Admissions Model (4 layers, 128 dim, 128 ctx)
-│   └── tinygpt_v2.pt             # Legacy toy model checkpoint
+│   ├── tinygpt_admissions.pt      # Trained admissions model checkpoint
+│   └── tinygpt_v2.pt              # Legacy general-purpose checkpoint
 ├── src/
-│   ├── model.py                  # TinyGPT architecture (Transformer blocks, LayerNorm, LM head)
-│   ├── tokenizer.py              # Regex tokenizer with currency, GPA, email & phone handling
-│   ├── dataset.py                # Sequence chunker & LanguageModelDataset loader
-│   ├── generation.py             # Autoregressive generation with temperature, top-k & repetition penalty
-│   ├── attention.py              # Multi-head causal self-attention with causal masking
-│   ├── transformer_block.py      # Pre-LN Transformer block with residual connections
-│   ├── feed_forward.py           # Two-layer MLP with GELU activation
-│   ├── embeddings.py             # Token embedding lookup
-│   ├── positional_embedding.py   # Learned positional embeddings
-│   └── checkpoint.py             # Checkpoint serialization and deserialization
-├── train_admissions.py           # Training pipeline optimized for admissions model
-├── admissions_chat.py            # Admissions assistant terminal UI with shortcuts & debug
-├── evaluate_admissions.py        # 12-category automated factual benchmark suite
-├── main.py                       # Original train-and-chat runner for legacy model
-├── chat_v2.py                    # Standalone chat for legacy model
-├── requirements.txt              # PyTorch and NumPy dependencies
-└── changesForBot.md              # Detailed implementation plan & design roadmap
+│   ├── intent_router.py           # [NEW] TF-IDF intent & OOD classifier (4 classes)
+│   ├── query_normalizer.py        # [NEW] Shorthand expander & canonical question mapper
+│   ├── fallback_engine.py         # [NEW] Greeting, OOD, and vague input response pools
+│   ├── model.py                   # TinyGPT Transformer architecture
+│   ├── tokenizer.py               # Domain-aware regex tokenizer
+│   ├── dataset.py                 # LanguageModelDataset (context window 128)
+│   ├── generation.py              # Autoregressive generation (top-k, temp, rep. penalty)
+│   ├── attention.py               # Multi-head causal self-attention
+│   ├── transformer_block.py       # Pre-LN Transformer block
+│   ├── feed_forward.py            # GELU feed-forward network
+│   ├── embeddings.py              # Token embedding table
+│   ├── positional_embedding.py    # Learned positional embeddings
+│   └── checkpoint.py              # Save / load checkpoint utilities
+├── train_admissions.py            # Admissions model training pipeline
+├── admissions_chat.py             # [UPGRADED] Smart terminal assistant (intent + normalizer)
+├── evaluate_admissions.py         # [UPGRADED] 27-test benchmark suite (4 sections)
+├── main.py                        # Legacy train + chat runner
+├── chat_v2.py                     # Legacy model chat
+├── requirements.txt               # PyTorch + NumPy
+├── smartBotChanges.md             # Smart layer design & implementation plan
+└── changesForBot.md               # Original admissions bot design roadmap
 ```
 
 ---
 
-## 🧠 Model Specifications & Hyperparameters
+## 🧠 Model Specifications
 
-| Hyperparameter | Original Toy Model | Admissions Model | Rationale |
-| :--- | :--- | :--- | :--- |
-| **Context Length** | 64 tokens | **128 tokens** | Accommodates complete answers and lists without cutoff. |
-| **Embedding Dimension ($d_{\text{model}}$)** | 64 | **128** | Captures richer semantic vectors for domain terminology. |
-| **Attention Heads** | 4 (dim 16) | **4 (dim 32)** | Enhanced attention projection per head. |
-| **Transformer Layers** | 2 | **4** | Deeper representation for multi-step policy logic. |
-| **Feed-Forward Dimension** | 256 | **512** | Standard $4 \times d_{\text{model}}$ expansion ratio. |
-| **Vocabulary Size** | ~653 tokens | **~808 tokens** | Includes specialized numeric and currency tokens. |
-| **Total Parameters** | ~188,000 | **~808,000** | Scaled capacity while retaining fast CPU computation. |
-| **Inference Temperature** | 0.8 | **0.25 – 0.30** | Prevents creative hallucination on factual questions. |
-| **Inference Top-K** | 20 | **5** | Restricts candidate pool to top factual choices. |
-| **Repetition Penalty** | None | **1.15** | Eliminates circular loops in generation. |
-| **Target Training Loss** | 0.30 | **0.15** | Tight factual convergence during training. |
+| Hyperparameter | Original Toy Model | Admissions Model |
+|:---|:---:|:---:|
+| Context Length | 64 tokens | **128 tokens** |
+| Embedding Dim | 64 | **128** |
+| Attention Heads | 4 (dim 16) | **4 (dim 32)** |
+| Transformer Layers | 2 | **4** |
+| Feed-Forward Dim | 256 | **512** |
+| Vocabulary Size | ~653 | **~808** |
+| Total Parameters | ~188,000 | **~808,000** |
+| Inference Temperature | 0.8 | **0.25 – 0.30** |
+| Top-K Sampling | 20 | **5** |
+| Repetition Penalty | None | **1.15** |
+| Training Loss Target | 0.30 | **0.15** |
 
 ---
 
 ## 🛠️ Troubleshooting
 
-- **`ModuleNotFoundError: No module named 'torch'`**
-  Ensure your virtual environment is active (`.venv\Scripts\activate` on Windows, `source .venv/bin/activate` on macOS/Linux).
-- **`FileNotFoundError: checkpoints/tinygpt_admissions.pt`**
-  Run `python train_admissions.py` to train and generate the admissions checkpoint.
-- **Windows Terminal Encoding Glitches**
-  The scripts automatically reconfigure standard output to UTF-8. If your console displays font artifacts, run:
-  ```powershell
-  $env:PYTHONIOENCODING="utf-8"
-  ```
-- **Out of Scope Questions**
-  TinyGPT is a specialized ~808K parameter model trained specifically on undergraduate admissions. Questions outside this domain may produce ungrounded tokens. Use the built-in shortcuts (`faq`, `deadlines`, `contact`) or run in factual mode for optimal results.
+| Problem | Fix |
+|:---|:---|
+| `ModuleNotFoundError: No module named 'torch'` | Activate virtual env: `.venv\Scripts\Activate.ps1` (Windows) or `source .venv/bin/activate` |
+| `FileNotFoundError: checkpoints/tinygpt_admissions.pt` | Run `python train_admissions.py` first |
+| Windows terminal shows garbled characters | Run `$env:PYTHONIOENCODING="utf-8"` before starting |
+| Bot gives strange answers to general questions | The smart OOD layer will now redirect these — make sure you are running the latest `admissions_chat.py` |
 
 ---
 
 ## 📜 License & Credits
 
-Built for educational exploration of Transformer architectures and specialized LLM fine-tuning from scratch. Inspired by the GPT series (Radford et al.) and Andrej Karpathy's `nanoGPT`.
+Built for educational exploration of Transformer architectures and domain-specialized neural language models. Inspired by the GPT series (Radford et al.) and Andrej Karpathy's `nanoGPT`.
