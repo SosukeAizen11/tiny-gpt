@@ -11,13 +11,16 @@ from src.model import TinyGPT
 from src.generation import generate_text
 from src.checkpoint import load_checkpoint
 from src.tokenizer import Tokenizer
+from src.intent_router import classify_intent
+from src.query_normalizer import normalize_query
+from src.fallback_engine import handle_greeting, handle_out_of_scope, handle_vague
 from main import show_debug_info
 
 
 def print_banner():
     print("=" * 68)
     print("UNIVERSITY OFFICE OF UNDERGRADUATE ADMISSIONS")
-    print("Virtual Admissions & Enrollment Assistant (TinyGPT)")
+    print("Virtual Admissions & Enrollment Assistant (TinyGPT v2 – Smart)")
     print("=" * 68)
     print("Welcome! I am here to help answer questions about admission requirements,")
     print("application deadlines, tuition & aid, academic majors, and campus life.\n")
@@ -101,6 +104,7 @@ def main():
 
         lower = prompt.lower()
 
+        # ── Hard-wired shortcuts (bypass everything) ──────────────────────────
         if lower in ["quit", "exit"]:
             print("\nThank you for consulting the Admissions Office. Goodbye!")
             break
@@ -127,11 +131,47 @@ def main():
             )
             continue
 
-        # Generate response using factual parameters
+        # ── Intelligent Hybrid Layer ──────────────────────────────────────────
+
+        # Step 1: Classify intent
+        intent_result = classify_intent(prompt)
+        intent = intent_result.intent
+
+        # Step 2: Route based on intent class
+        if intent == "GREETING_OR_CHITCHAT":
+            response = handle_greeting(prompt)
+            print(f"\nAdmissions Bot: {response}\n")
+            continue
+
+        if intent == "OUT_OF_SCOPE":
+            response = handle_out_of_scope(prompt)
+            print(f"\nAdmissions Bot: {response}\n")
+            continue
+
+        if intent == "VAGUE_AMBIGUOUS":
+            # Try normalizer first — maybe it can expand a single keyword
+            normalized, was_expanded = normalize_query(prompt)
+            if was_expanded:
+                # We could answer it — inform the user what we understood
+                print(f"\n  [Understood as: \"{normalized}\"]\n")
+                prompt_to_use = normalized
+            else:
+                # Truly ambiguous — ask for clarification
+                response = handle_vague(prompt)
+                print(f"\nAdmissions Bot: {response}\n")
+                continue
+        else:
+            # IN_DOMAIN_ADMISSION: try to normalize/expand the query
+            normalized, was_expanded = normalize_query(prompt)
+            if was_expanded:
+                print(f"\n  [Understood as: \"{normalized}\"]\n")
+            prompt_to_use = normalized
+
+        # Step 3: Generate admissions answer using the (possibly normalized) prompt
         response = generate_text(
             model=model,
             tokenizer=tokenizer,
-            prompt=prompt,
+            prompt=prompt_to_use,
             max_new_tokens=65,
             context_length=context_length,
             temperature=0.3,
